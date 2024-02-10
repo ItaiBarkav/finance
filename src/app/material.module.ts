@@ -14,11 +14,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
   imports: [
+    MatSort,
+    MatSortHeader,
     MatInputModule,
     MatCardModule,
     MatButtonModule,
@@ -38,6 +41,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     ScrollingModule,
   ],
   exports: [
+    MatSort,
+    MatSortHeader,
     MatInputModule,
     MatCardModule,
     MatButtonModule,
