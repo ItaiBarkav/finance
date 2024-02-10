@@ -8,22 +8,41 @@
       <button type="button" (click)="openFileSelector()">Browse Files</button>
     </ng-template>
   </ngx-file-drop>
-  <div class="upload-table">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-        </tr>
-      </thead>
-      <tbody class="upload-name-style">
-        @for (item of files; track $index) {
-        <tr>
-          <td>
-            <strong>{{ item.relativePath }}</strong>
-          </td>
-        </tr>
-        }
-      </tbody>
+  <div>
+    <table mat-table [dataSource]="transactions" class="mat-elevation-z8">
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>date</th>
+        <td mat-cell *matCellDef="let element">{{ element.date }}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>name</th>
+        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef>amount</th>
+        <td mat-cell *matCellDef="let element">{{ element.amount }}</td>
+      </ng-container>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>type</th>
+        <td mat-cell *matCellDef="let element">{{ element.type }}</td>
+      </ng-container>
+      <ng-container matColumnDef="details">
+        <th mat-header-cell *matHeaderCellDef>details</th>
+        <td mat-cell *matCellDef="let element">{{ element.details }}</td>
+      </ng-container>
+      <ng-container matColumnDef="debitAmount">
+        <th mat-header-cell *matHeaderCellDef>debitAmount</th>
+        <td mat-cell *matCellDef="let element">{{ element.debitAmount }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="title"></tr>
+      <tr
+        mat-row
+        *matRowDef="let myRowData; columns: title"
+        [style.background-color]="
+          myRowData.name == 'פז אפליקציית יילו' ? 'red' : 'yellow'
+        "
+      ></tr>
     </table>
   </div>
 </div>
