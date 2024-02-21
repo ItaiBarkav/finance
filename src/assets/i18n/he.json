@@ -1,5 +1,6 @@
 {
   "table": {
+    "card": "כרטיס",
     "date": "תאריך",
     "name": "שם",
     "amount": "סכום",
@@ -7,5 +8,9 @@
     "details": "פרטים",
     "debitAmount": "סכום לחיוב",
     "sum": "סה\"כ"
+  },
+  "data": {
+    "card": "לכרטיס",
+    "americanExspress": "אמריקן אקספרס"
   }
 }

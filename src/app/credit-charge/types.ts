@@ -1,4 +1,5 @@
 export interface Transaction {
+  card: number;
   date: string;
   name: string;
   amount: number;

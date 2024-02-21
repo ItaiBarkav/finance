@@ -1,4 +1,5 @@
-export const TITLE = [
+export const HEADERS = [
+  'card',
   'date',
   'name',
   'amount',
@@ -6,5 +7,3 @@ export const TITLE = [
   'details',
   'debitAmount',
 ];
-
-export const CARD = 'כרטיס';

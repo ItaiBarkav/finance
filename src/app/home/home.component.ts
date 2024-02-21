@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CreditChargeComponent } from '../credit-charge/credit-charge.component';
 import { MaterialModule } from '../material.module';
-import { UploadFileComponent } from '../upload-file/UploadFileComponent';
+import { UploadFileComponent } from '../upload-file/upload-file.component';
 
 @Component({
   selector: 'app-home',
