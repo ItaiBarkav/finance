@@ -1,5 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
+import { TranslocoModule } from '@ngneat/transloco';
 import { MaterialModule } from '../material.module';
 import { CARD, TITLE as HEADERS } from './config';
 import { Transaction } from './types';
@@ -7,7 +9,7 @@ import { Transaction } from './types';
 @Component({
   selector: 'app-credit-charge',
   standalone: true,
-  imports: [MaterialModule],
+  imports: [CommonModule, MaterialModule, TranslocoModule],
   templateUrl: './credit-charge.component.html',
   styleUrl: './credit-charge.component.scss',
 })
