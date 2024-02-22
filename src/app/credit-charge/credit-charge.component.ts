@@ -22,10 +22,10 @@ import { Transaction } from './types';
 export class CreditChargeComponent {
   @ViewChild(MatTable) table: MatTable<any> | undefined;
 
-  @Input() set file(_file: File | undefined) {
-    if (_file) {
+  @Input() set files(_files: File[] | undefined) {
+    if (_files) {
       this.hasFile = true;
-      this.createTable(_file);
+      _files.map((file) => this.createTable(file));
     }
   }
 

@@ -14,8 +14,21 @@ export class HighlightRowDirective {
 
   constructor(private el: ElementRef) {
     effect(() => {
-      if (this.name().includes('פז')) {
-        this.el.nativeElement.style.backgroundColor = 'yellow';
+      if (
+        this.name().includes('פז') ||
+        this.name().includes('תפוז') ||
+        this.name().includes('אלון')
+      ) {
+        this.el.nativeElement.style.backgroundColor = '#fcaa1f';
+      } else if (this.name().includes('חבר')) {
+        this.el.nativeElement.style.backgroundColor = '#8fd7f3';
+      } else if (this.name().includes('הראל') || this.name().includes('הפול')) {
+        this.el.nativeElement.style.backgroundColor = '#79c870';
+      } else if (
+        this.name().includes('פיצה') ||
+        this.name().includes('חומוס')
+      ) {
+        this.el.nativeElement.style.backgroundColor = '#d40f8c';
       }
     });
   }

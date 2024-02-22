@@ -10,18 +10,22 @@ import { MaterialModule } from '../material.module';
   styleUrl: './upload-file.component.scss',
 })
 export class UploadFileComponent {
-  @Output() files = new EventEmitter<File>();
+  @Output() files = new EventEmitter<File[]>();
 
   dropped(files: NgxFileDropEntry[]): void {
+    let _files: File[] = [];
+
     files.forEach((droppedFile) => {
       if (droppedFile.fileEntry.isFile) {
         const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
-        fileEntry.file((file) => this.files.emit(file));
+        fileEntry.file((file) => _files.push(file));
       } else {
         // It was a directory (empty directories are added, otherwise only files)
         const fileEntry = droppedFile.fileEntry as FileSystemDirectoryEntry;
         console.log(droppedFile.relativePath, fileEntry);
       }
     });
+
+    this.files.emit(_files);
   }
 }

@@ -1,4 +1,8 @@
-<ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)">
+<ngx-file-drop
+  dropZoneLabel="Drop files here"
+  [accept]="'.csv'"
+  (onFileDrop)="dropped($event)"
+>
   <ng-template
     ngx-file-drop-content-tmp
     let-openFileSelector="openFileSelector"

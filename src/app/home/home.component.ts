@@ -11,9 +11,9 @@ import { UploadFileComponent } from '../upload-file/upload-file.component';
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  file: File | undefined;
+  files: File[] | undefined;
 
-  getFiles(file: File): void {
-    this.file = file;
+  getFiles(files: File[]): void {
+    this.files = files;
   }
 }
