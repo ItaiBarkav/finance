@@ -1,9 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, ViewChild } from '@angular/core';
+import { APP_INITIALIZER, Component, Input, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
-import { TranslocoModule } from '@ngneat/transloco';
+import {
+  TRANSLOCO_CONFIG,
+  TRANSLOCO_LOADER,
+  TranslocoModule,
+  TranslocoService,
+  translate,
+  translocoConfig,
+} from '@ngneat/transloco';
+import { firstValueFrom } from 'rxjs';
 import { HighlightRowDirective } from '../directives/highlight-row.directive';
 import { MaterialModule } from '../material.module';
+import { TranslocoHttpLoader } from '../transloco-loader';
 import { HEADERS } from './config';
 import { Transaction } from './types';
 
@@ -18,6 +27,29 @@ import { Transaction } from './types';
   ],
   templateUrl: './credit-charge.component.html',
   styleUrl: './credit-charge.component.scss',
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (translocoService: TranslocoService) => async () =>
+        await firstValueFrom(translocoService.load('he')),
+      deps: [TranslocoService],
+    },
+    {
+      provide: TRANSLOCO_CONFIG,
+      useValue: translocoConfig({
+        availableLangs: ['he'],
+        defaultLang: 'he',
+        prodMode: true,
+        missingHandler: {
+          allowEmpty: true,
+        },
+      }),
+    },
+    {
+      provide: TRANSLOCO_LOADER,
+      useClass: TranslocoHttpLoader,
+    },
+  ],
 })
 export class CreditChargeComponent {
   @ViewChild(MatTable) table: MatTable<any> | undefined;
@@ -39,6 +71,8 @@ export class CreditChargeComponent {
   private detailsIndex = 4;
   private debitAmountIndex = 5;
   private dataIndex = 0;
+
+  constructor(private translocoService: TranslocoService) {}
 
   private createTable(file: File): void {
     const reader = new FileReader();
@@ -66,10 +100,20 @@ export class CreditChargeComponent {
     this.table?.renderRows();
   }
 
-  private setHeader(row: string[]): void {
+  private async setHeader(row: string[]): Promise<void> {
+    // console.log('!!!!!!');
+    // this.translocoService
+    //   .selectTranslate('data.card', {}, 'he')
+    //   .subscribe(console.log);
+    // console.log('@@@@');
+    // await firstValueFrom(this.translocoService.load('he'));
+    console.log(this.translocoService.getTranslation());
+    console.log(this.translocoService.getTranslation('he'));
+    console.log(translate('data.card'));
+
     if (
       row.find(
-        (value) => value.includes('לכרטיס') // TODO: use transloco
+        (value) => value.includes(translate('data.card')) // TODO: use transloco
       )
     ) {
       this.card = Number(row[0].split(' ').pop()!);
