@@ -1,20 +1,28 @@
 @if (hasFile) {
 <div *transloco="let t; read: 'table'">
-  <table mat-table [dataSource]="transactions()" class="mat-elevation-z8">
+  <table
+    mat-table
+    matSort
+    matSortDisableClear
+    [dataSource]="dataSource"
+    (matSortChange)="sortTransactions($event)"
+  >
     <ng-container matColumnDef="card">
-      <th mat-header-cell *matHeaderCellDef>{{ t("card") }}</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ t("card") }}</th>
       <td mat-cell *matCellDef="let element">{{ element.card }}</td>
     </ng-container>
     <ng-container matColumnDef="date">
-      <th mat-header-cell *matHeaderCellDef>{{ t("date") }}</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ t("date") }}</th>
       <td mat-cell *matCellDef="let element">{{ element.date }}</td>
     </ng-container>
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>{{ t("name") }}</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ t("name") }}</th>
       <td mat-cell *matCellDef="let element">{{ element.name }}</td>
     </ng-container>
     <ng-container matColumnDef="amount">
-      <th mat-header-cell *matHeaderCellDef>{{ t("amount") }}</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ t("amount") }}
+      </th>
       <td mat-cell *matCellDef="let element">{{ element.amount }}</td>
     </ng-container>
     <ng-container matColumnDef="type">
@@ -22,11 +30,15 @@
       <td mat-cell *matCellDef="let element">{{ element.type }}</td>
     </ng-container>
     <ng-container matColumnDef="details">
-      <th mat-header-cell *matHeaderCellDef>{{ t("details") }}</th>
+      <th mat-header-cell *matHeaderCellDef>
+        {{ t("details") }}
+      </th>
       <td mat-cell *matCellDef="let element">{{ element.details }}</td>
     </ng-container>
     <ng-container matColumnDef="debitAmount">
-      <th mat-header-cell *matHeaderCellDef>{{ t("debitAmount") }}</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ t("debitAmount") }}
+      </th>
       <td mat-cell *matCellDef="let element">{{ element.debitAmount }}</td>
     </ng-container>
 

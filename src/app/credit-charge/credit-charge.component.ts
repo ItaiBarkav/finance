@@ -7,7 +7,8 @@ import {
   effect,
   signal,
 } from '@angular/core';
-import { MatTable } from '@angular/material/table';
+import { Sort } from '@angular/material/sort';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { TranslocoModule } from '@ngneat/transloco';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { map } from 'rxjs';
@@ -38,7 +39,6 @@ export class CreditChargeComponent {
   @Input() set files(_files: File[] | undefined) {
     if (_files) {
       this.hasFile = true;
-      this.filesLength = _files.length;
       _files.forEach((file) => {
         this.rawDataService
           .createTable(file)
@@ -51,15 +51,17 @@ export class CreditChargeComponent {
   hasFile = false;
   headers = HEADERS;
   sum = 0;
-  transactions: WritableSignal<Transaction[]> = signal([]);
-  filesLength = 0;
   chartData: ChartData[] = [];
+  dataSource = new MatTableDataSource<Transaction>([]);
+
+  private transactions: WritableSignal<Transaction[]> = signal([]);
 
   constructor(
     private expensesCategoryService: ExpensesCategoryService,
     private rawDataService: RawDataService
   ) {
     effect(() => {
+      this.dataSource = new MatTableDataSource(this.transactions());
       this.calcSum();
       this.updatePieChart();
     });
@@ -67,6 +69,87 @@ export class CreditChargeComponent {
 
   customColors(): ColorScheme[] {
     return Object.entries(Color).map(([name, value]) => ({ name, value }));
+  }
+
+  sortTransactions(sort: Sort): void {
+    switch (sort.active) {
+      case 'amount': {
+        if (sort.direction === 'asc') {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort((a, b) => b.amount - a.amount),
+          ];
+        } else {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort((a, b) => a.amount - b.amount),
+          ];
+        }
+        break;
+      }
+      case 'debitAmount': {
+        if (sort.direction === 'asc') {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort(
+              (a, b) => b.debitAmount - a.debitAmount
+            ),
+          ];
+        } else {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort(
+              (a, b) => a.debitAmount - b.debitAmount
+            ),
+          ];
+        }
+        break;
+      }
+      case 'card': {
+        if (sort.direction === 'asc') {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort((a, b) => b.card - a.card),
+          ];
+        } else {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort((a, b) => a.card - b.card),
+          ];
+        }
+        break;
+      }
+      case 'name': {
+        if (sort.direction === 'asc') {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort((a, b) =>
+              b.name.localeCompare(a.name)
+            ),
+          ];
+        } else {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort((a, b) =>
+              a.name.localeCompare(b.name)
+            ),
+          ];
+        }
+        break;
+      }
+      case 'date': {
+        if (sort.direction === 'asc') {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort(
+              (a, b) =>
+                this.parseDate(b.date).getTime() -
+                this.parseDate(a.date).getTime()
+            ),
+          ];
+        } else {
+          this.dataSource.data = [
+            ...this.dataSource.data.sort(
+              (a, b) =>
+                this.parseDate(a.date).getTime() -
+                this.parseDate(b.date).getTime()
+            ),
+          ];
+        }
+        break;
+      }
+    }
   }
 
   private calcSum(): void {
@@ -102,5 +185,12 @@ export class CreditChargeComponent {
 
       this.chartData = [...this.chartData];
     });
+  }
+
+  private parseDate(date: string): Date {
+    const splitDate = date.split('/');
+    return new Date(
+      Date.parse(`${splitDate[1]}/${splitDate[0]}/${splitDate[2]}`)
+    );
   }
 }
