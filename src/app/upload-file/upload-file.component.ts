@@ -16,14 +16,8 @@ export class UploadFileComponent {
     let _files: File[] = [];
 
     files.forEach((droppedFile) => {
-      if (droppedFile.fileEntry.isFile) {
-        const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
-        fileEntry.file((file) => _files.push(file));
-      } else {
-        // It was a directory (empty directories are added, otherwise only files)
-        const fileEntry = droppedFile.fileEntry as FileSystemDirectoryEntry;
-        console.log(droppedFile.relativePath, fileEntry);
-      }
+      const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
+      fileEntry.file((file) => _files.push(file));
     });
 
     this.files.emit(_files);

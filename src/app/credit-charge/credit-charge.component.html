@@ -1,6 +1,6 @@
 @if (hasFile) {
 <div *transloco="let t; read: 'table'">
-  <table mat-table [dataSource]="transactions" class="mat-elevation-z8">
+  <table mat-table [dataSource]="transactions()" class="mat-elevation-z8">
     <ng-container matColumnDef="card">
       <th mat-header-cell *matHeaderCellDef>{{ t("card") }}</th>
       <td mat-cell *matCellDef="let element">{{ element.card }}</td>

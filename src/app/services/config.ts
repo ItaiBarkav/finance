@@ -1,7 +1,9 @@
-export const FUEL = ['פז', 'תפוז', 'אלון'];
-export const HVR = ['חבר'];
-export const FOOD = ['חומוס', 'פיצה'];
-export const INSURANCE = ['הפול', 'הראל'];
+const FUEL = { key: 'FUEL', value: ['פז', 'תפוז', 'אלון'] };
+const HVR = { key: 'HVR', value: ['חבר'] };
+const FOOD = { key: 'FOOD', value: ['חומוס', 'פיצה'] };
+const INSURANCE = { key: 'INSURANCE', value: ['הפול', 'הראל'] };
+
+export const CATEGORIES = [FUEL, HVR, FOOD, INSURANCE];
 
 export enum Color {
   FUEL = '#fcaa1f',

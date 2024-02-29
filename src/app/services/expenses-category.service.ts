@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Color, FOOD, FUEL, HVR, INSURANCE } from './config';
+import { CATEGORIES, Color } from './config';
 
 @Injectable({
   providedIn: 'root',
@@ -8,15 +8,13 @@ export class ExpensesCategoryService {
   getColor(name: string): string {
     let color = '';
 
-    if (FUEL.some((fuel) => name.includes(fuel))) {
-      color = Color['FUEL'];
-    } else if (HVR.some((hvr) => name.includes(hvr))) {
-      color = Color['HVR'];
-    } else if (FOOD.some((food) => name.includes(food))) {
-      color = Color['FOOD'];
-    } else if (INSURANCE.some((insurance) => name.includes(insurance))) {
-      color = Color['INSURANCE'];
-    } else {
+    CATEGORIES.forEach((category) => {
+      if (category.value.some((word) => name.includes(word))) {
+        color = this.getColorValue(category.key);
+      }
+    });
+
+    if (color === '') {
       color = Color['OTHER'];
     }
 
@@ -24,26 +22,36 @@ export class ExpensesCategoryService {
   }
 
   getCategory(name: string): string {
-    let category = '';
+    let categoryByName = '';
 
-    if (FUEL.some((fuel) => name.includes(fuel))) {
-      category = this.getKeyByValue(Color.FUEL);
-    } else if (HVR.some((hvr) => name.includes(hvr))) {
-      category = this.getKeyByValue(Color.HVR);
-    } else if (FOOD.some((food) => name.includes(food))) {
-      category = this.getKeyByValue(Color.FOOD);
-    } else if (INSURANCE.some((insurance) => name.includes(insurance))) {
-      category = this.getKeyByValue(Color.INSURANCE);
-    } else {
-      category = this.getKeyByValue(Color.OTHER);
+    CATEGORIES.forEach((category) => {
+      if (category.value.some((word) => name.includes(word))) {
+        categoryByName = category.key;
+      }
+    });
+
+    if (categoryByName === '') {
+      categoryByName = this.getKeyByValue(Color.OTHER);
     }
 
-    return category;
+    return categoryByName;
   }
 
   private getKeyByValue(value: string): string {
     return (Object.keys(Color) as (keyof typeof Color)[]).find(
       (key) => Color[key] === value
     )!;
+  }
+
+  private getColorValue(category: string): Color {
+    let color: Color;
+
+    Object.entries(Color).map(([key, value]) => {
+      if (category === key) {
+        color = value;
+      }
+    });
+
+    return color!;
   }
 }
