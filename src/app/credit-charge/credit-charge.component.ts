@@ -2,10 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, ViewChild } from '@angular/core';
 import { MatTable } from '@angular/material/table';
 import { TranslocoModule } from '@ngneat/transloco';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { HighlightRowDirective } from '../directives/highlight-row.directive';
 import { MaterialModule } from '../material.module';
+import { Color } from '../services/config';
+import { ExpensesCategoryService } from '../services/expenses-category.service';
 import { HEADERS } from './config';
-import { Transaction } from './types';
+import { ChartData, ColorScheme, Transaction } from './types';
 
 @Component({
   selector: 'app-credit-charge',
@@ -15,6 +18,7 @@ import { Transaction } from './types';
     MaterialModule,
     TranslocoModule,
     HighlightRowDirective,
+    NgxChartsModule,
   ],
   templateUrl: './credit-charge.component.html',
   styleUrl: './credit-charge.component.scss',
@@ -25,7 +29,8 @@ export class CreditChargeComponent {
   @Input() set files(_files: File[] | undefined) {
     if (_files) {
       this.hasFile = true;
-      _files.map((file) => this.createTable(file));
+      this.filesLength = _files.length;
+      _files.map((file, index) => this.createTable(file, index));
     }
   }
 
@@ -33,6 +38,8 @@ export class CreditChargeComponent {
   headers = HEADERS;
   sum = 0;
   transactions = new Array<Transaction>();
+  filesLength = 0;
+  chartData: ChartData[] = [];
 
   private translateScope = 'data';
   private card = 0;
@@ -40,14 +47,20 @@ export class CreditChargeComponent {
   private debitAmountIndex = 5;
   private dataIndex = 0;
 
-  private createTable(file: File): void {
+  constructor(private expensesCategoryService: ExpensesCategoryService) {}
+
+  customColors(): ColorScheme[] {
+    return Object.entries(Color).map(([name, value]) => ({ name, value }));
+  }
+
+  private createTable(file: File, index: number): void {
     const reader = new FileReader();
 
     reader.readAsText(file);
-    reader.onload = () => this.buildTable(reader.result as string);
+    reader.onload = () => this.buildTable(reader.result as string, index);
   }
 
-  private buildTable(fileData: string): void {
+  private buildTable(fileData: string, index: number): void {
     const data = fileData
       .split('\n')
       .map((row) => row.trim().split(','))
@@ -64,6 +77,10 @@ export class CreditChargeComponent {
     this.buildRows(data, dataIndex);
     this.calcSum();
     this.table?.renderRows();
+
+    if (index === this.filesLength - 1) {
+      this.updatePieChart();
+    }
   }
 
   private setHeader(row: string[]): void {
@@ -94,10 +111,11 @@ export class CreditChargeComponent {
     if (row.every((value) => value !== '')) {
       return index + 1;
     }
+
     return -1;
   }
 
-  private buildRows(data: string[][], dataIndex: number) {
+  private buildRows(data: string[][], dataIndex: number): void {
     for (let index = dataIndex; index < data.length - this.dataIndex; index++) {
       this.transactions.push({
         card: this.card,
@@ -116,5 +134,32 @@ export class CreditChargeComponent {
       (transactions, transaction) => transactions + transaction.debitAmount,
       0
     );
+  }
+
+  private updatePieChart(): void {
+    this.transactions.map((transaction) => {
+      let value = 0;
+      const category = this.expensesCategoryService.getCategory(
+        transaction.name
+      );
+
+      if (this.chartData.some((data) => data.name === category)) {
+        const currentCategory = this.chartData.filter(
+          (data) => data.name === category
+        );
+        const categoryValue = this.chartData.splice(
+          this.chartData.indexOf(currentCategory[0]),
+          1
+        );
+        value = categoryValue[0].value;
+      }
+
+      this.chartData.push({
+        name: category,
+        value: value + transaction.debitAmount,
+      });
+
+      this.chartData = [...this.chartData];
+    });
   }
 }

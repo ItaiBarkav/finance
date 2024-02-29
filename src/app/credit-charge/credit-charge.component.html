@@ -43,4 +43,13 @@
     <span>{{ sum | number : "1.0-2" }}</span>
   </div>
 </div>
+<div>
+  <ngx-charts-advanced-pie-chart
+    [view]="[1000, 400]"
+    [results]="chartData"
+    [customColors]="customColors()"
+    [animations]="false"
+  >
+  </ngx-charts-advanced-pie-chart>
+</div>
 }
