@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop';
+import {
+  FileSystemFileEntry,
+  NgxFileDropEntry,
+  NgxFileDropModule,
+} from 'ngx-file-drop';
 import { MaterialModule } from '../material.module';
 
 @Component({
@@ -17,9 +21,10 @@ export class UploadFileComponent {
 
     files.forEach((droppedFile) => {
       const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
-      fileEntry.file((file) => _files.push(file));
+      fileEntry.file((file) => {
+        _files.push(file);
+        this.files.emit(_files);
+      });
     });
-
-    this.files.emit(_files);
   }
 }
