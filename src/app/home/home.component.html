@@ -1,8 +1,6 @@
 <div>
-  <div>
-    <app-upload-file (files)="getFiles($event)"></app-upload-file>
-  </div>
-  <div>
-    <app-credit-charge [files]="files"></app-credit-charge>
-  </div>
+  @if(!files) {
+  <app-upload-file (files)="getFiles($event)"></app-upload-file>
+  }
+  <app-credit-charge [files]="files"></app-credit-charge>
 </div>

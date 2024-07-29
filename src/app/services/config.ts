@@ -1,4 +1,4 @@
-const FUEL = { key: 'FUEL', value: ['פז', 'תפוז', 'אלון'] };
+const FUEL = { key: 'FUEL', value: ['פז', 'תפוז', 'אלון', 'דלק', 'סונול'] };
 const HVR = { key: 'HVR', value: ['חבר'] };
 const FOOD = {
   key: 'FOOD',
@@ -11,9 +11,18 @@ const FOOD = {
     'ניו דלי',
     "ג'לטו",
     'שפע הברון',
+    'BAR',
+    'שישו ושימחו',
+    'שווארמה',
+    'הנדלר',
+    'מלביר',
+    'קונדטוריה',
+    'סביח',
+    'קפה',
+    'גלידות',
   ],
 };
-const INSURANCE = { key: 'INSURANCE', value: ['הפול', 'הראל'] };
+const INSURANCE = { key: 'INSURANCE', value: ['הפול', 'הראל', 'ביטוח'] };
 const CULTURE = { key: 'CULTURE', value: ['התרבות'] };
 const ONLINE = {
   key: 'ONELINE',

@@ -1,3 +1,13 @@
+.header {
+  font-weight: bold;
+}
+
+.chart {
+  display: flex;
+  direction: ltr;
+  height: 20rem;
+}
+
 ::ng-deep.mat-sort-header-container {
   justify-content: center;
 }
@@ -5,4 +15,13 @@
 ::ng-deep.mat-mdc-cell,
 ::ng-deep.mat-mdc-header-cell {
   text-align: center !important;
+  direction: ltr;
+}
+
+::ng-deep.advanced-pie-legend
+  .legend-items-container
+  .legend-items
+  .legend-item
+  .item-value {
+  margin-top: 0 !important;
 }

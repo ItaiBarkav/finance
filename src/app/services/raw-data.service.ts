@@ -61,7 +61,8 @@ export class RawDataService {
 
     if (
       row.find(
-        (value) => value.includes('אמריקן אקספרס') || value.includes('מסטרקארד') // TODO: use transloco
+        (value) =>
+          value.includes('אמריקן אקספרס') || value.includes('גולד - מסטרקארד') // TODO: use transloco
       )
     ) {
       this.card = Number(row[0].split(' ').pop());
