@@ -8,6 +8,12 @@
   height: 20rem;
 }
 
+.export {
+  display: flex;
+  float: left;
+  margin: 1rem;
+}
+
 ::ng-deep.mat-sort-header-container {
   justify-content: center;
 }

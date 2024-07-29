@@ -8,13 +8,14 @@ import { Transaction } from '../credit-charge/types';
 export class RawDataService {
   private transactions = new BehaviorSubject<Array<Transaction>>([]);
   private translateScope = 'data';
-  private card = 0;
+  private card: number | null = 0;
   private detailsIndex = 4;
   private debitAmountIndex = 5;
   private dataIndex = 0;
   private nameIndex = 1;
   private amountIndex = 2;
   private typeIndex = 3;
+  private dateIndex = 0;
 
   constructor() {}
 
@@ -93,6 +94,17 @@ export class RawDataService {
       this.debitAmountIndex = 5;
       this.nameIndex = 1;
     }
+
+    if (row.find((value) => value.includes('debitAmount'))) {
+      this.card = null;
+      this.dateIndex = 1;
+      this.nameIndex = 2;
+      this.amountIndex = 3;
+      this.typeIndex = 4;
+      this.detailsIndex = 5;
+      this.debitAmountIndex = 6;
+      this.dataIndex = 0;
+    }
   }
 
   private getDataIndex(row: string[], index: number): number {
@@ -124,8 +136,8 @@ export class RawDataService {
 
       this.transactions.next([
         {
-          card: this.card,
-          date: data[index][0],
+          card: this.card ?? Number(data[index][0]),
+          date: data[index][this.dateIndex],
           name: data[index][this.nameIndex],
           amount: Number(
             data[index][this.amountIndex]

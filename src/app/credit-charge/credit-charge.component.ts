@@ -11,6 +11,7 @@ import { Sort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { TranslocoModule } from '@ngneat/transloco';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { saveAs } from 'file-saver';
 import { map } from 'rxjs';
 import { HighlightRowDirective } from '../directives/highlight-row.directive';
 import { MaterialModule } from '../material.module';
@@ -150,6 +151,46 @@ export class CreditChargeComponent {
         break;
       }
     }
+  }
+
+  exportData(): void {
+    const fileName = this.dataSource.data[0].date.slice(3);
+    this.exportToCsv(`${fileName}.csv`, this.dataSource.data);
+  }
+
+  private exportToCsv(filename: string, rows: any[]): void {
+    if (!rows || !rows.length) {
+      return;
+    }
+
+    const separator = ',';
+    const keys = Object.keys(rows[0]);
+    const csvContent =
+      keys.join(separator) +
+      '\n' +
+      rows
+        .map((row) => {
+          return keys
+            .map((k) => {
+              let cell = row[k] === null || row[k] === undefined ? '' : row[k];
+              cell =
+                cell instanceof Date
+                  ? cell.toLocaleString()
+                  : cell.toString().replace(/"/g, '""');
+              if (cell.search(/("|,|\n)/g) >= 0) {
+                cell = `"${cell}"`;
+              }
+              return cell;
+            })
+            .join(separator);
+        })
+        .join('\n');
+
+    const blob = new Blob([String.fromCharCode(0xfeff) + csvContent], {
+      type: 'text/csv;utf-8;',
+    });
+
+    saveAs(blob, filename);
   }
 
   private calcSum(): void {
