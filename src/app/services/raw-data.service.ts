@@ -28,9 +28,15 @@ export class RawDataService {
   }
 
   private buildTable(fileData: string): void {
+    const regex = /,(?=(?:[^"]*"[^"]*")*[^"]*$)/;
     const data = fileData
       .split('\n')
-      .map((row) => row.trim().split(','))
+      .map((row) =>
+        row
+          .trim()
+          .split(regex)
+          .map((part) => part.replace(/^"|"$/g, ''))
+      )
       .filter((values) => values[0] !== '');
     let dataIndex = -1;
 
@@ -99,7 +105,7 @@ export class RawDataService {
 
   private buildRows(data: string[][], dataIndex: number): void {
     for (let index = dataIndex; index < data.length - this.dataIndex; index++) {
-      if (data[index][1] === '"סך חיוב בש""ח:"') {
+      if (data[index][1].includes('סך חיוב')) {
         continue;
       }
 
@@ -121,11 +127,17 @@ export class RawDataService {
           card: this.card,
           date: data[index][0],
           name: data[index][this.nameIndex],
-          amount: Number(data[index][this.amountIndex].replace(/\u200E/g, '')),
+          amount: Number(
+            data[index][this.amountIndex]
+              .replaceAll(',', '')
+              .replace(/\u200E/g, '')
+          ),
           type: data[index][this.typeIndex],
           details: data[index][this.detailsIndex],
           debitAmount: Number(
-            data[index][this.debitAmountIndex].replace(/\u200E/g, '')
+            data[index][this.debitAmountIndex]
+              .replaceAll(',', '')
+              .replace(/\u200E/g, '')
           ),
         },
         ...this.transactions.value,
