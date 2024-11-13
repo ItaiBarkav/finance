@@ -20,9 +20,14 @@ const FOOD = {
     'סביח',
     'קפה',
     'גלידות',
+    'רמי לוי',
+    'מקדונלדס',
   ],
 };
-const INSURANCE = { key: 'INSURANCE', value: ['הפול', 'הראל', 'ביטוח'] };
+const INSURANCE = {
+  key: 'INSURANCE',
+  value: ['הפול', 'הראל', 'ביטוח', 'בטוח'],
+};
 const CULTURE = { key: 'CULTURE', value: ['התרבות'] };
 const ONLINE = {
   key: 'ONELINE',
