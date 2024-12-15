@@ -123,7 +123,8 @@ export class RawDataService {
 
       if (
         data[index][0] === 'עסקאות בחו˝ל' ||
-        data[index][0] === 'תאריך רכישה'
+        data[index][0] === 'תאריך רכישה' ||
+        data[index][0] === 'תאריך העסקה'
       ) {
         this.dataIndex = 0;
         this.nameIndex = 2;
@@ -131,6 +132,16 @@ export class RawDataService {
         this.typeIndex = 4;
         this.detailsIndex = 1;
         this.debitAmountIndex = 5;
+        continue;
+      }
+
+      if (data[index][0].includes('עסקאות מחויבות בש')) {
+        this.detailsIndex = 4;
+        this.debitAmountIndex = 5;
+        this.dataIndex = 0;
+        this.nameIndex = 1;
+        this.amountIndex = 2;
+        this.typeIndex = 3;
         continue;
       }
 
