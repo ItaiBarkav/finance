@@ -1,5 +1,8 @@
-const FUEL = { key: 'FUEL', value: ['פז', 'תפוז', 'אלון', 'דלק', 'סונול'] };
-const HVR = { key: 'HVR', value: ['חבר'] };
+const FUEL = {
+  key: 'FUEL',
+  value: ['פז', 'תפוז', 'אלון', 'דלק', 'סונול', 'יעד תמר', 'פנגו'],
+};
+const SHOPPING = { key: 'SHOPPING', value: ['המשביר', 'רנואר', 'MOOOB'] };
 const FOOD = {
   key: 'FOOD',
   value: [
@@ -23,6 +26,8 @@ const FOOD = {
     'רמי לוי',
     'מקדונלדס',
     'קשת טעמים',
+    'מאפיית',
+    'אושר עד',
   ],
 };
 const INSURANCE = {
@@ -35,11 +40,11 @@ const ONLINE = {
   value: ['ALIBABA COM', 'ALIEXPRESS', 'AMZN'],
 };
 
-export const CATEGORIES = [FUEL, HVR, FOOD, INSURANCE, CULTURE, ONLINE];
+export const CATEGORIES = [FUEL, SHOPPING, FOOD, INSURANCE, CULTURE, ONLINE];
 
 export enum Color {
   FUEL = '#fcaa1f',
-  HVR = '#8fd7f3',
+  SHOPPING = '#8fd7f3',
   FOOD = '#79c870',
   INSURANCE = '#d40f8c',
   CULTURE = '#00a0a0',

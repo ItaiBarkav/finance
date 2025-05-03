@@ -11,13 +11,10 @@ export class RawDataService {
   private card: number | null = 0;
   private detailsIndex = 4;
   private debitAmountIndex = 5;
-  private dataIndex = 0;
   private nameIndex = 1;
   private amountIndex = 2;
   private typeIndex = 3;
   private dateIndex = 0;
-
-  constructor() {}
 
   createTable(file: File): Observable<Transaction[]> {
     const reader = new FileReader();
@@ -39,15 +36,9 @@ export class RawDataService {
           .map((part) => part.replace(/^"|"$/g, ''))
       )
       .filter((values) => values[0] !== '');
-    let dataIndex = -1;
 
-    data.map((row, index) => {
-      this.setHeader(row);
-      if (dataIndex === -1) {
-        dataIndex = this.getDataIndex(row, index);
-      }
-    });
-
+    data.map((row) => this.setHeader(row));
+    const dataIndex = this.getDataIndex(data);
     this.buildRows(data, dataIndex);
   }
 
@@ -60,7 +51,6 @@ export class RawDataService {
       this.card = Number(row[0].split(' ').pop());
       this.detailsIndex = 4;
       this.debitAmountIndex = 5;
-      this.dataIndex = 0;
       this.nameIndex = 1;
       this.amountIndex = 2;
       this.typeIndex = 3;
@@ -74,11 +64,10 @@ export class RawDataService {
     ) {
       this.card = Number(row[0].split(' ').pop());
       this.detailsIndex = 7;
-      this.debitAmountIndex = 4;
-      this.dataIndex = 1;
-      this.nameIndex = 1;
-      this.amountIndex = 2;
-      this.typeIndex = 3;
+      this.debitAmountIndex = 5;
+      this.nameIndex = 2;
+      this.amountIndex = 3;
+      this.typeIndex = 4;
     }
 
     if (
@@ -87,7 +76,6 @@ export class RawDataService {
       )
     ) {
       this.card = Number(row[0].split('-').at(0));
-      this.dataIndex = 2;
       this.amountIndex = 7;
       this.typeIndex = 8;
       this.detailsIndex = 9;
@@ -103,21 +91,51 @@ export class RawDataService {
       this.typeIndex = 4;
       this.detailsIndex = 5;
       this.debitAmountIndex = 6;
-      this.dataIndex = 0;
+    }
+
+    if (
+      row.find(
+        (value) => value.includes('פלטינום עסקי') // TODO: use transloco
+      )
+    ) {
+      this.card = 5343;
+      this.detailsIndex = 5;
+      this.debitAmountIndex = 3;
+      this.nameIndex = 1;
+      this.amountIndex = 2;
+      this.typeIndex = 4;
     }
   }
 
-  private getDataIndex(row: string[], index: number): number {
-    if (row.every((value) => value !== '')) {
-      return index + 1;
-    }
+  private isValidDate(value: string): boolean {
+    const splitDate = value.split('/');
+    const date = new Date(`${splitDate[1]}/${splitDate[0]}/${splitDate[2]}`);
 
-    return -1;
+    return !isNaN(date.getTime());
+  }
+
+  private getDataIndex(data: string[][]): number {
+    let maxLength = 0;
+    let maxIndex = -1;
+
+    data.forEach((row, index) => {
+      if (row.length === 0) return;
+
+      if (this.isValidDate(row[this.dateIndex]) && row.length > maxLength) {
+        maxLength = row.length;
+        maxIndex = index;
+      }
+    });
+
+    return maxIndex;
   }
 
   private buildRows(data: string[][], dataIndex: number): void {
-    for (let index = dataIndex; index < data.length - this.dataIndex; index++) {
-      if (data[index][1].includes('סך חיוב')) {
+    for (let index = dataIndex; index < data.length; index++) {
+      if (
+        data[index][0].includes('את המידע') ||
+        data[index][1].includes('סך חיוב')
+      ) {
         continue;
       }
 
@@ -126,7 +144,6 @@ export class RawDataService {
         data[index][0] === 'תאריך רכישה' ||
         data[index][0] === 'תאריך העסקה'
       ) {
-        this.dataIndex = 0;
         this.nameIndex = 2;
         this.amountIndex = 3;
         this.typeIndex = 4;
@@ -138,7 +155,6 @@ export class RawDataService {
       if (data[index][0].includes('עסקאות מחויבות בש')) {
         this.detailsIndex = 4;
         this.debitAmountIndex = 5;
-        this.dataIndex = 0;
         this.nameIndex = 1;
         this.amountIndex = 2;
         this.typeIndex = 3;
@@ -151,14 +167,14 @@ export class RawDataService {
           date: data[index][this.dateIndex],
           name: data[index][this.nameIndex],
           amount: Number(
-            data[index][this.amountIndex]
+            this.amountTrim(data[index][this.amountIndex])
               .replaceAll(',', '')
               .replace(/\u200E/g, '')
           ),
           type: data[index][this.typeIndex],
           details: data[index][this.detailsIndex],
           debitAmount: Number(
-            data[index][this.debitAmountIndex]
+            this.amountTrim(data[index][this.debitAmountIndex])
               .replaceAll(',', '')
               .replace(/\u200E/g, '')
           ),
@@ -166,5 +182,10 @@ export class RawDataService {
         ...this.transactions.value,
       ]);
     }
+  }
+
+  private amountTrim(amount: string): string {
+    const splitedAmount = amount.split(' ');
+    return splitedAmount.length === 1 ? splitedAmount[0] : splitedAmount[1];
   }
 }
