@@ -2,7 +2,10 @@ const FUEL = {
   key: 'FUEL',
   value: ['פז', 'תפוז', 'אלון', 'דלק', 'סונול', 'יעד תמר', 'פנגו'],
 };
-const SHOPPING = { key: 'SHOPPING', value: ['המשביר', 'רנואר', 'MOOOB'] };
+const SHOPPING = {
+  key: 'SHOPPING',
+  value: ['המשביר', 'רנואר', 'MOOOB', 'דלתא'],
+};
 const FOOD = {
   key: 'FOOD',
   value: [

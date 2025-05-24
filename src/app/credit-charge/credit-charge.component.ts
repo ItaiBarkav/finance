@@ -154,8 +154,9 @@ export class CreditChargeComponent {
   }
 
   exportData(): void {
-    const fileName = this.dataSource.data[0].date.slice(3);
-    this.exportToCsv(`${fileName}.csv`, this.dataSource.data);
+    const data = this.dataSource.data;
+    const fileName = data[data.length - 1].date.slice(3).replace('/', '_');
+    this.exportToCsv(`${fileName}.csv`, data);
   }
 
   private exportToCsv(filename: string, rows: any[]): void {

@@ -1,11 +1,15 @@
+import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { read, utils, WorkBook, WorkSheet } from 'xlsx';
 import { Transaction } from '../credit-charge/types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RawDataService {
+  private readonly CSV = 'csv';
+
   private transactions = new BehaviorSubject<Array<Transaction>>([]);
   private translateScope = 'data';
   private card: number | null = 0;
@@ -15,19 +19,52 @@ export class RawDataService {
   private amountIndex = 2;
   private typeIndex = 3;
   private dateIndex = 0;
+  private isUsDate = false;
+
+  constructor(private datePipe: DatePipe) {}
 
   createTable(file: File): Observable<Transaction[]> {
     const reader = new FileReader();
+    const format = file.name.split('.')[1];
 
-    reader.onload = () => this.buildTable(reader.result as string);
-    reader.readAsText(file);
+    if (format === this.CSV) {
+      reader.onload = () =>
+        this.buildTable(this.buildTableFromCsv(reader.result as string));
+      reader.readAsText(file);
+    } else {
+      reader.onload = (event: any) =>
+        this.buildTable(this.readExcelData(event));
+      reader.readAsArrayBuffer(file);
+    }
 
     return this.transactions.asObservable();
   }
 
-  private buildTable(fileData: string): void {
+  private readExcelData(event: any): string[][] {
+    const data: Uint8Array = new Uint8Array(event.target.result);
+    const workbook: WorkBook = read(data, { type: 'array' });
+
+    const firstSheetName: string = workbook.SheetNames[0];
+    const worksheet: WorkSheet = workbook.Sheets[firstSheetName];
+
+    return utils.sheet_to_json<string[]>(worksheet, {
+      header: 1,
+      blankrows: false,
+      defval: '',
+      raw: false,
+    });
+  }
+
+  private buildTable(data: string[][]): void {
+    data.map((row) => this.setHeader(row));
+    const dataIndex = this.getDataIndex(data);
+    this.buildRows(data, dataIndex);
+  }
+
+  private buildTableFromCsv(fileData: string): string[][] {
     const regex = /,(?=(?:[^"]*"[^"]*")*[^"]*$)/;
-    const data = fileData
+
+    return fileData
       .split('\n')
       .map((row) =>
         row
@@ -36,10 +73,6 @@ export class RawDataService {
           .map((part) => part.replace(/^"|"$/g, ''))
       )
       .filter((values) => values[0] !== '');
-
-    data.map((row) => this.setHeader(row));
-    const dataIndex = this.getDataIndex(data);
-    this.buildRows(data, dataIndex);
   }
 
   private setHeader(row: string[]): void {
@@ -54,6 +87,7 @@ export class RawDataService {
       this.nameIndex = 1;
       this.amountIndex = 2;
       this.typeIndex = 3;
+      this.isUsDate = true;
     }
 
     if (
@@ -105,13 +139,15 @@ export class RawDataService {
       this.amountIndex = 2;
       this.typeIndex = 4;
     }
-  }
 
-  private isValidDate(value: string): boolean {
-    const splitDate = value.split('/');
-    const date = new Date(`${splitDate[1]}/${splitDate[0]}/${splitDate[2]}`);
-
-    return !isNaN(date.getTime());
+    if (row.find((value) => value.includes('max בהצדעה'))) {
+      this.card = Number(row[0].split('-')[0]);
+      this.detailsIndex = 10;
+      this.debitAmountIndex = 5;
+      this.nameIndex = 1;
+      this.amountIndex = 7;
+      this.typeIndex = 4;
+    }
   }
 
   private getDataIndex(data: string[][]): number {
@@ -130,11 +166,37 @@ export class RawDataService {
     return maxIndex;
   }
 
+  private isValidDate(value: string): boolean {
+    return !isNaN(this.getDate(value).getTime());
+  }
+
+  private getDate(value: string): Date {
+    let splitChar = '/';
+    let monthIndex = 1;
+    let dayIndex = 0;
+
+    if (value.includes('-')) {
+      splitChar = '-';
+    }
+
+    const splitDate = value.split(splitChar);
+
+    if (this.isUsDate) {
+      monthIndex = 0;
+      dayIndex = 1;
+    }
+
+    return new Date(
+      `${splitDate[monthIndex]}/${splitDate[dayIndex]}/${splitDate[2]}`
+    );
+  }
+
   private buildRows(data: string[][], dataIndex: number): void {
     for (let index = dataIndex; index < data.length; index++) {
       if (
         data[index][0].includes('את המידע') ||
-        data[index][1].includes('סך חיוב')
+        data[index][1].includes('סך חיוב') ||
+        !this.isValidDate(data[index][this.dateIndex])
       ) {
         continue;
       }
@@ -164,7 +226,10 @@ export class RawDataService {
       this.transactions.next([
         {
           card: this.card ?? Number(data[index][0]),
-          date: data[index][this.dateIndex],
+          date: this.datePipe.transform(
+            this.getDate(data[index][this.dateIndex]).toDateString(),
+            'dd/MM/yyyy'
+          )!,
           name: data[index][this.nameIndex],
           amount: Number(
             this.amountTrim(data[index][this.amountIndex])
