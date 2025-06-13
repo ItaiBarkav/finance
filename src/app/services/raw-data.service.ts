@@ -93,15 +93,17 @@ export class RawDataService {
     if (
       row.find(
         (value) =>
-          value.includes('אמריקן אקספרס') || value.includes('גולד - מסטרקארד') // TODO: use transloco
+          value.includes('אמריקן אקספרס') ||
+          value.includes('גולד - מסטרקארד') ||
+          value.includes('זהב - ביזנס') // TODO: use transloco
       )
     ) {
       this.card = Number(row[0].split(' ').pop());
       this.detailsIndex = 7;
-      this.debitAmountIndex = 5;
-      this.nameIndex = 2;
-      this.amountIndex = 3;
-      this.typeIndex = 4;
+      this.debitAmountIndex = 4;
+      this.nameIndex = 1;
+      this.amountIndex = 2;
+      this.typeIndex = 3;
     }
 
     if (
@@ -167,16 +169,22 @@ export class RawDataService {
   }
 
   private isValidDate(value: string): boolean {
-    return !isNaN(this.getDate(value).getTime());
+    const date = this.getDate(value);
+
+    return date ? !isNaN(date.getTime()) : false;
   }
 
-  private getDate(value: string): Date {
+  private getDate(value: string): Date | null {
     let splitChar = '/';
     let monthIndex = 1;
     let dayIndex = 0;
 
     if (value.includes('-')) {
       splitChar = '-';
+    }
+
+    if (value.includes('.')) {
+      splitChar = '.';
     }
 
     const splitDate = value.split(splitChar);
@@ -186,9 +194,21 @@ export class RawDataService {
       dayIndex = 1;
     }
 
+    if (
+      !this.isNumeric(splitDate[monthIndex]) ||
+      !this.isNumeric(splitDate[dayIndex]) ||
+      !this.isNumeric(splitDate[2])
+    ) {
+      return null;
+    }
+
     return new Date(
       `${splitDate[monthIndex]}/${splitDate[dayIndex]}/${splitDate[2]}`
     );
+  }
+
+  private isNumeric(str: string): boolean {
+    return !isNaN(Number(str));
   }
 
   private buildRows(data: string[][], dataIndex: number): void {
@@ -227,7 +247,7 @@ export class RawDataService {
         {
           card: this.card ?? Number(data[index][0]),
           date: this.datePipe.transform(
-            this.getDate(data[index][this.dateIndex]).toDateString(),
+            this.getDate(data[index][this.dateIndex])!.toDateString(),
             'dd/MM/yyyy'
           )!,
           name: data[index][this.nameIndex],
